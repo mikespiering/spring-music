@@ -1,0 +1,68 @@
+# Simple pipeline deploying code from Github, running through unit test, and deploying to Cloud Foundry
+resources:
+  - name: music-repo
+    type: git
+    source: 
+      uri: https://github.com/nsagoo-pivotal/spring-music.git
+      branch: master
+
+  - name: version
+    type: semver
+    source: 
+      bucket: concourse-ns
+      key: current-version
+      access_key_id: {{access_key_id}}
+      secret_access_key: {{secret_access_key}}
+      initial_version: 1.0.0
+
+  - name: music-release
+    type: s3
+    source:
+      bucket: concourse-ns
+      regexp: spring-music-(.*).war
+      access_key_id: {{access_key_id}}
+      secret_access_key: {{secret_access_key}}
+
+  - name: cloud-foundry
+    type: cf
+    source:
+      api: {{api}}
+      username: {{username}}
+      password: {{password}}
+      organization: {{organization}}
+      space: {{space}}
+      skip_cert_check: false
+
+jobs:
+  - name: unit
+    plan: 
+      - get: music-repo
+        trigger: true
+      - task: unit
+        file: music-repo/ci/tasks/unit.yml
+
+  - name: build-binary
+    serial: true #builds will queue up and execute one-by-one
+    plan:
+      - get: music-repo
+        passed: [unit]
+        trigger: true
+      - get: version
+        params: {bump: patch}
+      - task: build-artifact
+        file: music-repo/ci/tasks/build-artifact.yml
+      - put: music-release
+        params:
+          file: music-repo/build/libs/spring-music*.war
+      - put: version
+        params:
+          file: version/number
+
+  - name: acceptance-tests
+    plan:
+      - get: music-repo
+        passed: [build-binary]
+        trigger: true
+      - put: cloud-foundry
+        params:
+          manifest: music-repo/manifest.yml
