@@ -9,7 +9,7 @@ resources:
   - name: version
     type: semver
     source: 
-      bucket: concourse-ns
+      bucket: {{bucket}}
       key: current-version
       access_key_id: {{access_key_id}}
       secret_access_key: {{secret_access_key}}
