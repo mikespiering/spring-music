@@ -1,0 +1,8 @@
+---
+platform: linux
+image: docker:///datianshi/gradle
+inputs: 
+  - name: spring-music-repo
+  - name: version
+run: 
+  path: spring-music-repo/ci/concourse/tasks/build.sh
