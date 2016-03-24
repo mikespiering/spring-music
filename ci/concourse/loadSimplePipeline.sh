@@ -1,0 +1,1 @@
+fly sp -t lite -c simplepipeline.yml -p spring-music-simple-push -l ../../../secrets.yml

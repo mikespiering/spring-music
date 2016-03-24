@@ -1,0 +1,1 @@
+fly sp -t lite -c pipelineGitVersioned.yml -p spring-music-git-versioned -l ../../../secrets.yml

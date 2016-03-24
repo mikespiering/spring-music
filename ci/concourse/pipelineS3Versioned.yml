@@ -36,6 +36,8 @@ jobs:
       - get: spring-music-repo
         trigger: true
         passed: [unit]
+      - get: version
+        params: {bump: minor}
       - task: build
         file: spring-music-repo/ci/concourse/tasks/buildVersioned.yml
   - name: cf-push
@@ -44,7 +46,7 @@ jobs:
         trigger: true
         passed: [build-binary]
       - task: build
-        file: spring-music-repo/ci/concourse/tasks/buildVersioned.yml
+        file: spring-music-repo/ci/concourse/tasks/build.yml
       - put: cf-deploy
         params:
              manifest: spring-music-repo/manifest.yml

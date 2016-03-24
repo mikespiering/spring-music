@@ -1,0 +1,1 @@
+fly sp -t lite -c pipelineS3Versioned.yml -p spring-music-s3-versioned -l ../../../secrets.yml
