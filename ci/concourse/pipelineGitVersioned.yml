@@ -8,13 +8,12 @@ resources:
   - name: version
     type: semver
     source:
-      driver: s3
-      bucket: {{aws_bucket}}
-      key: current-version
-      access_key_id: {{aws_access_key}}
-      secret_key_id: {{aws_secret_key}}
-      region_name: {{aws_region}}
+      driver: git
+      uri: {{versioned_github_url}}
+      branch: master
+      file: version
       initial_version: 1.0.0
+      private_key: {{concourse-repo-private-key}}
   - name: cf-deploy
     type: cf
     source:
@@ -36,7 +35,7 @@ jobs:
       - get: spring-music-repo
         trigger: true
         passed: [unit]
-      - get: version
+      - put: version
         params: {bump: minor}
       - task: build
         file: spring-music-repo/ci/concourse/tasks/buildGitVersioned.yml
