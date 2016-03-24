@@ -3,7 +3,7 @@ resources:
   - name: spring-music-repo
     type: git
     source: 
-      uri: https://github.com/mikespiering/spring-music
+      uri: {{github_url}}
 
   - name: version
     type: semver
