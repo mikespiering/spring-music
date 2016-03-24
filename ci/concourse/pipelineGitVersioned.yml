@@ -36,7 +36,7 @@ jobs:
       - get: spring-music-repo
         trigger: true
         passed: [unit]
-	- get: version
+      - get: version
         params: {bump: minor}
       - task: build
         file: spring-music-repo/ci/concourse/tasks/buildGitVersioned.yml
