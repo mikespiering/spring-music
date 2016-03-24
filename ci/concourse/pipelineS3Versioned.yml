@@ -1,0 +1,50 @@
+---
+resources:
+  - name: spring-music-repo
+    type: git
+    source: 
+      uri: {{github_url}}
+
+  - name: version
+    type: semver
+    source:
+      driver: s3
+      bucket: {{aws_bucket}}
+      key: current-version
+      access_key_id: {{aws_access_key}}
+      secret_key_id: {{aws_secret_key}}
+      region_name: {{aws_region}}
+      initial_version: 1.0.0
+  - name: cf-deploy
+    type: cf
+    source:
+       api: {{cf_apiurl}}
+       username: {{cf_username}}
+       password: {{cf_password}}
+       organization: {{cf_org}}
+       space: {{cf_space}}
+       skip_cert_check: true
+jobs:
+  - name: unit
+    plan:
+      - get: spring-music-repo
+        trigger: true
+      - task: unit
+        file: spring-music-repo/ci/concourse/tasks/unit.yml
+  - name: build-binary
+    plan:
+      - get: spring-music-repo
+        trigger: true
+        passed: [unit]
+      - task: build
+        file: spring-music-repo/ci/concourse/tasks/buildVersioned.yml
+  - name: cf-push
+    plan: 
+      - get: spring-music-repo
+        trigger: true
+        passed: [build-binary]
+      - task: build
+        file: spring-music-repo/ci/concourse/tasks/buildVersioned.yml
+      - put: cf-deploy
+        params:
+             manifest: spring-music-repo/manifest.yml

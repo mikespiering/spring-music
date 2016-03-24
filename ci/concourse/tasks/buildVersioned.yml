@@ -5,4 +5,4 @@ inputs:
   - name: spring-music-repo
   - name: version
 run: 
-  path: spring-music-repo/ci/concourse/tasks/buildGitVersioned.sh
+  path: spring-music-repo/ci/concourse/tasks/buildVersioned.sh
