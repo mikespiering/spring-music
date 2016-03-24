@@ -1,0 +1,1 @@
+fly sp -t lite -c pipeline.yml -p spring-music -l ../../../secrets.yml
